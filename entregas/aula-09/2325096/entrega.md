@@ -2,13 +2,15 @@
 
 **Aluno:** Eloísa Brandão  
 **RA:** 2325096  
-**Data:** 2026-10-18
+**Data:** 2026-10-22
 
 ## Repositório
 
 - **Projeto:** [unifaat-devops-portfolio](https://github.com/brandelas/unifaat-devops-portfolio)
-- **Implementação da Aula 09:** [aula-09](https://github.com/brandelas/unifaat-devops-portfolio/tree/main/aula-09)
+- **Implementação da Aula 09:** [aula-09](https://github.com/brandelas/unifaat-devops-portfolio/tree/feature/aula-09-ecr-ai-review/aula-09)
 - **Branch de desenvolvimento local:** `feature/aula-09-ecr-ai-review`
+- **Commit da aplicação publicada:** `f5121b9`
+- **Tag Git:** [`v1.0.0`](https://github.com/brandelas/unifaat-devops-portfolio/tree/v1.0.0)
 
 ## 1. Validações locais
 
@@ -17,25 +19,24 @@
 - [x] Contêiner executado localmente, com a porta 3001 do host mapeada para a porta 3000 do contêiner.
 - [x] Endpoint `/health` respondeu com status `ok`.
 - [x] Endpoint `/api/orders` retornou os pedidos de exemplo.
-- [x] Testes automatizados dos scripts: 12 testes passaram.
-- [x] Teste do Security Scan com um diff contendo padrões de risco identificou achados CRITICAL e retornou código de saída 1.
-- [x] Teste do Security Scan com um diff sem os padrões analisados terminou sem achados.
+- [x] AI Review local: cinco padrões obrigatórios detectados, severidades CRITICAL/WARNING verificadas e diff limpo sem achados.
+- [x] Proteção do `ecr-push.sh`: recusa publicar quando a árvore Git está suja.
 
-Esses resultados correspondem a verificações locais. Eles não comprovam a execução dos workflows no GitHub Actions nem a publicação de imagens no Amazon ECR.
+Esses resultados locais não substituem a validação dos workflows em Pull Requests no GitHub Actions.
 
 ## 2. Amazon ECR
 
 O projeto contém o script `aula-09/ecr-push.sh` e o workflow manual `build-push-ecr.yml`. A implementação prevê autenticação pelo AWS CLI e publicação de imagens com tags baseadas no commit, `latest` e tags semânticas quando houver uma tag Git no formato `vX.Y.Z`.
 
-**Status: pendente de validação no AWS Academy Learner Lab, região `us-east-1`.**
+**Status: publicado e validado no AWS Academy Learner Lab, região `us-east-1`.**
 
-- [ ] Executar o script e confirmar a publicação das imagens.
-- [ ] Confirmar a criação ou existência do repositório `technova-api`.
-- [ ] Fazer pull e executar uma imagem publicada.
-- [ ] Verificar o procedimento de rollback por tag ou digest.
-- [ ] Registrar evidências reais da publicação.
+- [x] Executar `ecr-push.sh` e confirmar a publicação das imagens.
+- [x] Criar e confirmar o repositório `technova-api`.
+- [x] Publicar tags `sha-f5121b9`, `latest`, `1.0.0`, `1.0` e `1`.
+- [x] Fazer pull e executar imagens pelas tags SHA e `1.0.0`; `/health` respondeu `ok` e `/api/orders` retornou três pedidos.
+- [x] Confirmar que as tags da release apontam para o digest `sha256:0a6729d3aa5136c3521a578d7e385b648fcc5fad88d1004bfecbe8f188e4f1ac`.
 
-A publicação no ECR não foi realizada durante as validações locais documentadas nesta entrega.
+O pull de uma tag SHA anterior também foi executado, validando a recuperação de uma versão específica para rollback.
 
 ## 3. Revisão automatizada no CI/CD
 
@@ -45,14 +46,16 @@ A análise utiliza regras heurísticas para identificar possíveis credenciais e
 
 A solução é baseada em regras locais e não chama um modelo de linguagem externo. Os resultados são indicativos e precisam de revisão humana; falsos positivos e falsos negativos são possíveis.
 
-**Status: scripts e testes locais validados; execução real no GitHub Actions pendente.**
+**Status: scripts e regras locais validados; execução em Pull Request pendente.**
 
 - [ ] Executar o workflow em um pull request.
 - [ ] Verificar o comentário automático com os achados.
 - [ ] Verificar o bloqueio do quality gate diante de um achado `CRITICAL`.
 - [ ] Registrar o link da execução e capturas de tela reais.
 
-A publicação de comentários em pull requests pode depender das permissões do repositório e da origem do pull request, especialmente quando ele vem de um fork.
+Nenhum Pull Request foi aberto. Por isso, o comentário automático e o quality gate ainda não foram executados em GitHub Actions.
+
+O workflow opcional de publicação no ECR foi acionado pela tag Git `v1.0.0`, mas falhou ao carregar credenciais AWS porque os secrets não estão configurados no GitHub. A publicação local via credenciais temporárias do Learner Lab funcionou. [Execução do workflow](https://github.com/brandelas/unifaat-devops-portfolio/actions/runs/39875333733).
 
 ## 4. Limitações
 
@@ -64,8 +67,9 @@ Os testes locais não substituem a validação integrada dos workflows no GitHub
 
 - **Testes locais:** executados conforme os resultados descritos nesta entrega.
 - **Docker local:** imagem construída e endpoints verificados.
-- **GitHub Actions:** execução real ainda não realizada.
-- **Amazon ECR:** publicação e rollback ainda não realizados.
-- **Capturas de tela e links de execução:** serão adicionados após as validações correspondentes.
+- **Amazon ECR:** publicação, tags e pull validados; screenshots do console ainda pendentes.
+- **GitHub Actions — publicação ECR:** execução falhou por ausência de secrets AWS.
+- **AI Review e quality gate em PR:** pendentes; nenhum PR foi aberto.
+- **Capturas de tela:** pendentes; nenhuma evidência visual foi fabricada.
 
-As etapas externas permanecem pendentes para não registrar como concluídas ações que ainda não foram executadas.
+As pendências de GitHub Actions e screenshots permanecem explícitas para não registrar ações não executadas como concluídas.
